@@ -28,7 +28,7 @@ import {
 /**
  * Creates and returns a Solana client with RPC and subscription endpoints.
  */
-export const createDefultSolanaClient = (): Client => {
+export const createDefaultSolanaClient = (): Client => {
   const rpc = createSolanaRpc(DEFAULT_RPC_URL_LOCAL);
   const rpcSubscriptions = createSolanaRpcSubscriptions(
     DEFAULT_RPC_SUBSCRIPTIONS_URL_LOCAL,

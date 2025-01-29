@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "transfer": "ts-node transfer.ts"
+    "transfer": "ts-node src/transfer.ts"
   },
   "keywords": [],
   "author": "github jenny07007",

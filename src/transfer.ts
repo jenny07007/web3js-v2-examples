@@ -8,11 +8,12 @@ import {
 import { getTransferSolInstruction } from "@solana-program/system";
 import {
   createDefaultTransaction,
-  createDefultSolanaClient,
+  createDefaultSolanaClient,
   signAndSendTransaction,
-} from "./utils/setups";
+} from "../utils/setups";
 
-import devWallet from "./dev-wallet.json";
+import devWallet from "../dev-wallet.json";
+import { LAMPORTS_PER_SOL } from "../utils/constants";
 
 (async () => {
   try {
@@ -26,7 +27,7 @@ import devWallet from "./dev-wallet.json";
     const recipient = await generateKeyPairSigner();
 
     // Initialize the Solana client using utility functions from utils/setups.ts
-    const client = createDefultSolanaClient();
+    const client = createDefaultSolanaClient();
 
     // createDefaultTransaction abstracts the creation of a transaction message, sets the payer, and retrieves the latest blockhash.
     const txMsg = pipe(await createDefaultTransaction(client, sender), (tx) =>
@@ -34,7 +35,7 @@ import devWallet from "./dev-wallet.json";
       appendTransactionMessageInstruction(
         // getTransferSolInstruction is imported from @solana-program/system
         getTransferSolInstruction({
-          amount: lamports(BigInt(0.7 * 1e9)),
+          amount: lamports(BigInt(0.7 * LAMPORTS_PER_SOL)),
           destination: recipient.address,
           source: sender,
         }),
@@ -53,7 +54,9 @@ import devWallet from "./dev-wallet.json";
       .send();
 
     console.log(
-      `Recipient Wallet Balance:  ${Number(recipientBalance.value) / 1e9} SOL`,
+      `Recipient Wallet Balance:  ${
+        Number(recipientBalance.value) / LAMPORTS_PER_SOL
+      } SOL`,
     );
   } catch (error) {
     console.log(error);
