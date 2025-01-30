@@ -29,24 +29,23 @@ import { LAMPORTS_PER_SOL } from "../utils/constants";
     // Initialize the Solana client using utility functions from utils/setups.ts
     const client = createDefaultSolanaClient();
 
-    // createDefaultTransaction abstracts the creation of a transaction message, sets the payer, and retrieves the latest blockhash.
-    const txMsg = pipe(await createDefaultTransaction(client, sender), (tx) =>
-      // Append the transfer instruction to the transaction, specifying the transfer of SOL.
-      appendTransactionMessageInstruction(
-        // getTransferSolInstruction is imported from @solana-program/system
-        getTransferSolInstruction({
-          amount: lamports(BigInt(0.7 * LAMPORTS_PER_SOL)),
-          destination: recipient.address,
-          source: sender,
-        }),
-        tx,
-      ),
+    // getTransferSolInstruction is imported from @solana-program/system
+    const instruction = getTransferSolInstruction({
+      amount: lamports(BigInt(0.7 * LAMPORTS_PER_SOL)),
+      destination: recipient.address,
+      source: sender,
+    });
+
+    const txSig = pipe(
+      // createDefaultTransaction abstracts the creation of a transaction message, sets the payer, and retrieves the latest blockhash.
+      await createDefaultTransaction(client, sender),
+      // Append the transfer instruction to the transaction
+      (tx) => appendTransactionMessageInstruction(instruction, tx),
+      // Sign and send the transaction using the signAndSendTransaction function from utils/setups.ts
+      (tx) => signAndSendTransaction(client, tx),
     );
 
-    // Sign and send the transaction using the signAndSendTransaction function from utils/setups.ts
-    const txSig = await signAndSendTransaction(client, txMsg);
-
-    console.log("Transaction Signature: ", txSig);
+    console.log("Transaction Signature: ", await txSig);
 
     // Retrieve and display the recipient's wallet balance.
     const recipientBalance = await client.rpc
