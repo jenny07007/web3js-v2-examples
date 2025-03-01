@@ -1,5 +1,5 @@
 {
-  "name": "web3js-v2-examples",
+  "name": "solana-kit-examples",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -8,10 +8,10 @@
   "keywords": [],
   "author": "github jenny07007",
   "license": "ISC",
-  "description": "examples of implementing web3js v2",
+  "description": "examples of implementing @solana/kit (old web3js v2)",
   "dependencies": {
     "@solana-program/system": "^0.6.2",
-    "@solana/web3.js": "^2.0.0"
+    "@solana/kit": "^2.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.12.0"

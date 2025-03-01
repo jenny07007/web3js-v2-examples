@@ -3,7 +3,7 @@ import {
   RpcSubscriptions,
   SolanaRpcApi,
   SolanaRpcSubscriptionsApi,
-} from "@solana/web3.js";
+} from "@solana/kit";
 
 export type Client = {
   rpc: Rpc<SolanaRpcApi>;

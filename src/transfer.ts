@@ -36,20 +36,20 @@ import { LAMPORTS_PER_SOL } from "../utils/constants";
       source: sender,
     });
 
-    const txSig = pipe(
+    const txSig = await pipe(
       // createDefaultTransaction abstracts the creation of a transaction message, sets the payer, and retrieves the latest blockhash.
-      await createDefaultTransaction(client, sender),
+      await createDefaultTransaction(client, sender as any),
       // Append the transfer instruction to the transaction
-      (tx) => appendTransactionMessageInstruction(instruction, tx),
+      (tx) => appendTransactionMessageInstruction(instruction, tx as any),
       // Sign and send the transaction using the signAndSendTransaction function from utils/setups.ts
-      (tx) => signAndSendTransaction(client, tx),
+      (tx) => signAndSendTransaction(client, tx as any),
     );
 
-    console.log("Transaction Signature: ", await txSig);
+    console.log("Transaction Signature: ", txSig);
 
     // Retrieve and display the recipient's wallet balance.
     const recipientBalance = await client.rpc
-      .getBalance(recipient.address)
+      .getBalance(recipient.address as any)
       .send();
 
     console.log(

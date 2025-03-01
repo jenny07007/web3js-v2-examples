@@ -16,7 +16,7 @@ import {
   signTransactionMessageWithSigners,
   getSignatureFromTransaction,
   sendAndConfirmTransactionFactory,
-} from "@solana/web3.js";
+} from "@solana/kit";
 
 import {
   DEFAULT_RPC_URL_LOCAL,
