@@ -4,7 +4,7 @@ import {
   setTransactionMessageFeePayerSigner,
   setTransactionMessageLifetimeUsingBlockhash,
   createTransactionMessage,
-  TransactionSigner,
+  TransactionSigner as KitTransactionSigner,
   createSolanaRpc,
   createSolanaRpcSubscriptions,
   generateKeyPairSigner,
@@ -16,7 +16,15 @@ import {
   signTransactionMessageWithSigners,
   getSignatureFromTransaction,
   sendAndConfirmTransactionFactory,
+  IInstruction,
+  appendTransactionMessageInstruction,
 } from "@solana/kit";
+
+// Import types from @solana/web3.js for compatibility with @solana-program/system
+import {
+  TransactionSigner as Web3TransactionSigner,
+  Address as Web3Address,
+} from "@solana/web3.js";
 
 import {
   DEFAULT_RPC_URL_LOCAL,
@@ -45,8 +53,11 @@ export const createDefaultSolanaClient = (): Client => {
  */
 export const createDefaultTransaction = async (
   client: Client,
-  feePayer: TransactionSigner,
+  feePayer: KitTransactionSigner | Web3TransactionSigner<string>,
 ) => {
+  // Convert Web3TransactionSigner to KitTransactionSigner if needed
+  const kitFeePayer = feePayer as unknown as KitTransactionSigner;
+
   // Retrieve the latest blockhash from the Solana network.
   const { value: latestBlockhash } = await client.rpc
     .getLatestBlockhash()
@@ -55,7 +66,7 @@ export const createDefaultTransaction = async (
   // Create and configure the transaction message.
   return pipe(
     createTransactionMessage({ version: 0 }),
-    (tx) => setTransactionMessageFeePayerSigner(feePayer, tx),
+    (tx) => setTransactionMessageFeePayerSigner(kitFeePayer, tx),
     (tx) => setTransactionMessageLifetimeUsingBlockhash(latestBlockhash, tx),
   );
 };
@@ -114,4 +125,45 @@ export const signAndSendTransaction = async (
   });
 
   return signature;
+};
+
+/**
+ * Helper function to append an instruction to a transaction message, handling type conversions.
+ *
+ * @param instruction - The instruction to append, can be from @solana/web3.js or @solana/kit
+ * @param transactionMessage - The transaction message to append the instruction to
+ * @returns The updated transaction message
+ */
+export const appendInstruction = <T extends CompilableTransactionMessage>(
+  instruction: any,
+  transactionMessage: T,
+): T => {
+  // Convert the instruction to the expected type for appendTransactionMessageInstruction
+  const kitInstruction = instruction as unknown as IInstruction<string>;
+  return appendTransactionMessageInstruction(
+    kitInstruction,
+    transactionMessage,
+  );
+};
+
+/**
+ * Helper function to convert a Kit address to a Web3 address
+ *
+ * @param address - The Kit address to convert
+ * @returns The address as a Web3 address
+ */
+export const toWeb3Address = <T extends string>(address: T): Web3Address<T> => {
+  return address as unknown as Web3Address<T>;
+};
+
+/**
+ * Helper function to convert a Kit signer to a Web3 transaction signer
+ *
+ * @param signer - The Kit signer to convert
+ * @returns The signer as a Web3 transaction signer
+ */
+export const toWeb3Signer = <T extends string>(
+  signer: KitTransactionSigner,
+): Web3TransactionSigner<T> => {
+  return signer as unknown as Web3TransactionSigner<T>;
 };
